@@ -12,6 +12,7 @@ import it.gestionecompagnia.dao.compagnia.CompagniaDAOImpl;
 import it.gestionecompagnia.dao.impiegato.ImpiegatoDAO;
 import it.gestionecompagnia.dao.impiegato.ImpiegatoDAOImpl;
 import it.gestionecompagnia.model.Compagnia;
+import it.gestionecompagnia.model.Impiegato;
 
 public class TestGestioneCompagnia {
 
@@ -36,6 +37,21 @@ public class TestGestioneCompagnia {
 
 			testUpdateCompagnia(compagniaDAOInstance);
 			System.out.println("In tabella compagnia ci sono " + compagniaDAOInstance.list().size() + " elementi");
+
+			System.out.println("__________________________________________________________________________________");
+
+			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
+
+			testInsertImpiegato(impiegatoDAOInstance, compagniaDAOInstance);
+			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
+
+			testFindById(impiegatoDAOInstance);
+
+			testDeleteImpiegato(impiegatoDAOInstance, compagniaDAOInstance);
+			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
+
+			testUpdateImpiegato(impiegatoDAOInstance, compagniaDAOInstance);
+			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -113,5 +129,99 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("..........testUpdateCompagnia fine: PASSED............");
+	}
+
+	private static void testInsertImpiegato(ImpiegatoDAO impiegatoDAOInstance, CompagniaDAO compagniaDAOInstance)
+			throws Exception {
+		System.out.println(".......testInsertCompagnia inizio.............");
+		int quantiNegoziInseriti = compagniaDAOInstance.list().size();
+		if (quantiNegoziInseriti < 1) {
+			throw new RuntimeException("testInsertImpiegato: FAILED, non ci sono negozi nel DB");
+		}
+		Compagnia primoCompagniaLista = compagniaDAOInstance.list().get(0);
+		Date dataNascita = new SimpleDateFormat("dd-MM-yyyy").parse("02-12-1999");
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("10-02-2022");
+		Impiegato flavioAmatoImpiegato = new Impiegato("Flavio", "Amato", "CodFisAmato", dataNascita, dataAssunzione,
+				primoCompagniaLista);
+		int quantiElementiInseriti = impiegatoDAOInstance.insert(flavioAmatoImpiegato);
+		if (quantiElementiInseriti < 1)
+			throw new RuntimeException("testInsertCompagnia : FAILED");
+
+		System.out.println(".......testInsertCompagnia fine: PASSED.............");
+	}
+
+	private static void testFindById(ImpiegatoDAO impiegatoDAOInstance) throws Exception {
+		System.out.println(".......testFindById inizio.............");
+		List<Impiegato> elencoVociPresenti = impiegatoDAOInstance.list();
+		if (elencoVociPresenti.size() < 1)
+			throw new RuntimeException("testFindById : FAILED, non ci sono voci sul DB");
+
+		Impiegato primoDellaLista = elencoVociPresenti.get(0);
+
+		Impiegato elementoCheRicercoColDAO = impiegatoDAOInstance.get(primoDellaLista.getId());
+
+		if (elementoCheRicercoColDAO == null || !elementoCheRicercoColDAO.getNome().equals(primoDellaLista.getNome())
+				|| !elementoCheRicercoColDAO.getCognome().equals(primoDellaLista.getCognome())
+				|| !elementoCheRicercoColDAO.getCodiceFiscale().equals(primoDellaLista.getCodiceFiscale()))
+			throw new RuntimeException("testFindById : FAILED, i parametri non corrispondono");
+
+		System.out.println(".......testFindById fine: PASSED.............");
+	}
+
+	private static void testDeleteImpiegato(ImpiegatoDAO impiegatoDAOInstance, CompagniaDAO compagniaDAOInstance)
+			throws Exception {
+		System.out.println(".......testDeleteImpiegato inizio.............");
+		int quantiNegoziInseriti = compagniaDAOInstance.list().size();
+		if (quantiNegoziInseriti < 1) {
+			throw new RuntimeException("testDeleteImpiegato: FAILED, non ci sono negozi nel DB");
+		}
+		Compagnia primoCompagniaLista = compagniaDAOInstance.list().get(0);
+		Date dataNascita = new SimpleDateFormat("dd-MM-yyyy").parse("14-01-2000");
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("15-05-2018");
+		Impiegato peppeRossiImpiegato = new Impiegato("Peppe", "Rossi", "CodFisRossi", dataNascita, dataAssunzione,
+				primoCompagniaLista);
+		int quantiElementiInseriti = impiegatoDAOInstance.insert(peppeRossiImpiegato);
+		if (quantiElementiInseriti < 1)
+			throw new RuntimeException("testDeleteImpiegato : FAILED, aggiunzione impiegato non avvenuta");
+
+		int numeroElementiPresentiPrimaDellaRimozione = impiegatoDAOInstance.list().size();
+		Impiegato ultimoImpiegatoLista = impiegatoDAOInstance.list().get(numeroElementiPresentiPrimaDellaRimozione - 1);
+		impiegatoDAOInstance.delete(ultimoImpiegatoLista);
+
+		int numeroElementiPresentiDopoDellaRimozione = impiegatoDAOInstance.list().size();
+		if (numeroElementiPresentiDopoDellaRimozione != numeroElementiPresentiPrimaDellaRimozione - 1)
+			throw new RuntimeException("testDeleteImpiegato : FAILED, la rimozione non è avvenuta");
+
+		System.out.println(".......testDeleteImpiegato fine: PASSED.............");
+
+		System.out.println(".......testDeleteImpiegato fine: PASSED.............");
+
+	}
+
+	private static void testUpdateImpiegato(ImpiegatoDAO impiegatoDAOInstance, CompagniaDAO compagniaDAOInstance)
+			throws Exception {
+		System.out.println("..........testUpdateImpiegato inizio............");
+
+		if (compagniaDAOInstance.list().size() < 1) {
+			throw new RuntimeException("testUpdateImpiegato: FAILED, non ci sono compagnie nel DB");
+		}
+		Compagnia primaCompagniaLista = compagniaDAOInstance.list().get(0);
+
+		Date dataNascita = new SimpleDateFormat("dd-MM-yyyy").parse("20-01-1998");
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("12-12-2016");
+
+		Impiegato salvatoreAmatoImpiegato = new Impiegato("SalvatoreDaModificare", "AmatoDaModificare", "SLVTAMA",
+				dataNascita, dataAssunzione, primaCompagniaLista);
+		impiegatoDAOInstance.insert(salvatoreAmatoImpiegato);
+		List<Impiegato> impiegatiPresentiInLista = impiegatoDAOInstance.list();
+		int numeroElementiPrimaDellAggiornamento = impiegatiPresentiInLista.size();
+		int elementiAggiornati = impiegatoDAOInstance.update(new Impiegato(
+				impiegatiPresentiInLista.get(numeroElementiPrimaDellAggiornamento - 1).getId(), "SalvatoreModificato",
+				"AmatoModificato", "SLVTAMAMOD", dataNascita, dataAssunzione, primaCompagniaLista));
+		if (elementiAggiornati != 1) {
+			throw new RuntimeException("testUpdateImpiegato: FAILED, Aggiornamento non avvenuto correttamente");
+		}
+
+		System.out.println("..........testUpdateImpiegato fine: PASSED............");
 	}
 }
