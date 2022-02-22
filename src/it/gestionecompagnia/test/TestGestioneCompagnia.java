@@ -43,6 +43,8 @@ public class TestGestioneCompagnia {
 
 			testFindAllByDataAssunzioneGreaterThan(compagniaDAOInstance, impiegatoDAOInstance);
 
+			testFindAllByRagioneSocialeContiene(compagniaDAOInstance);
+
 			System.out.println("__________________________________________________________________________________");
 
 			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
@@ -262,5 +264,23 @@ public class TestGestioneCompagnia {
 				.findAllByDataAssunzioneGreaterThan(dataAssunzione);
 
 		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
+	}
+
+	private static void testFindAllByRagioneSocialeContiene(CompagniaDAO compagniaDAOInstance) throws Exception {
+		System.out.println("...........testFindAllByRagioneSocialeContiene inizio...........");
+
+		if (compagniaDAOInstance.list().size() < 1)
+			throw new RuntimeException("testFindAllByRagioneSocialeContiene: FAILED, Non ci sono compagnie nel DB");
+		List<Compagnia> compagnieConRagioniSocialiCheContengonoCu = compagniaDAOInstance
+				.findAllByRagioneSocialeContiene("cu");
+
+		for (Compagnia compagnieConRagioniSocialiCheContengonoCuItem : compagnieConRagioniSocialiCheContengonoCu) {
+
+			if (!(compagnieConRagioniSocialiCheContengonoCuItem.getRagioneSociale().contains("cu")))
+				throw new RuntimeException(
+						"testFindAllByRagioneSocialeContiene : FAILED, la lista contiene ragioni sociali che non iniziano col carattere in input");
+		}
+
+		System.out.println("...........testFindAllByRagioneSocialeContiene fine: PASSED...........");
 	}
 }

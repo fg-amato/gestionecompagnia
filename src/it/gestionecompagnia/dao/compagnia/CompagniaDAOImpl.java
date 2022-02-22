@@ -211,8 +211,34 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 	@Override
 	public List<Compagnia> findAllByRagioneSocialeContiene(String input) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (input.isBlank() || input == null)
+			throw new Exception("Input non valido");
+		Compagnia compagniaTemp = null;
+		List<Compagnia> result = new ArrayList<Compagnia>();
+
+		try (PreparedStatement ps = connection
+				.prepareStatement("select * from compagnia where ragionesociale like ?")) {
+
+			ps.setString(1, "%" + input + "%");
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					compagniaTemp = new Compagnia();
+					compagniaTemp.setFatturatoAnnuo(rs.getLong("fatturatoAnnuo"));
+					compagniaTemp.setRagioneSociale(rs.getString("ragioneSociale"));
+					compagniaTemp.setDataFondazione(rs.getDate("dataFondazione"));
+					compagniaTemp.setId(rs.getLong("ID"));
+					result.add(compagniaTemp);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override
