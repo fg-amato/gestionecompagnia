@@ -22,22 +22,20 @@ public class Compagnia {
 		this.dataFondazione = dataFondazione;
 	}
 
+	public Compagnia(String ragioneSociale, Long fatturatoAnnuo, Date dataFondazione, List<Impiegato> impiegati) {
+		super();
+		this.ragioneSociale = ragioneSociale;
+		this.fatturatoAnnuo = fatturatoAnnuo;
+		this.dataFondazione = dataFondazione;
+		this.impiegati = impiegati;
+	}
+
 	public Compagnia(Long id, String ragioneSociale, Long fatturatoAnnuo, Date dataFondazione) {
 		super();
 		this.id = id;
 		this.ragioneSociale = ragioneSociale;
 		this.fatturatoAnnuo = fatturatoAnnuo;
 		this.dataFondazione = dataFondazione;
-	}
-
-	public Compagnia(Long id, String ragioneSociale, Long fatturatoAnnuo, Date dataFondazione,
-			List<Impiegato> impiegati) {
-		super();
-		this.id = id;
-		this.ragioneSociale = ragioneSociale;
-		this.fatturatoAnnuo = fatturatoAnnuo;
-		this.dataFondazione = dataFondazione;
-		this.impiegati = impiegati;
 	}
 
 	public Long getId() {

@@ -181,8 +181,32 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 	@Override
 	public List<Compagnia> findAllByDataAssunzioneGreaterThan(Date dateInput) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		ArrayList<Compagnia> result = new ArrayList<Compagnia>();
+		Compagnia compagniaTemp = null;
+
+		try (PreparedStatement ps = connection
+				.prepareStatement("select distinct(c.id),c.ragionesociale, c.fatturatoannuo, c.datafondazione"
+						+ " from compagnia c inner join impiegato i on c.id = i.compagnia_id where i.dataassunzione > ?")) {
+			ps.setDate(1, new java.sql.Date(dateInput.getTime()));
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					compagniaTemp = new Compagnia();
+					compagniaTemp.setFatturatoAnnuo(rs.getLong("fatturatoAnnuo"));
+					compagniaTemp.setRagioneSociale(rs.getString("ragioneSociale"));
+					compagniaTemp.setDataFondazione(rs.getDate("dataFondazione"));
+					compagniaTemp.setId(rs.getLong("ID"));
+					result.add(compagniaTemp);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override

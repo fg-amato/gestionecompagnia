@@ -2,6 +2,7 @@ package it.gestionecompagnia.test;
 
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,8 @@ public class TestGestioneCompagnia {
 			System.out.println("In tabella compagnia ci sono " + compagniaDAOInstance.list().size() + " elementi");
 
 			testFindByExample(compagniaDAOInstance);
+
+			testFindAllByDataAssunzioneGreaterThan(compagniaDAOInstance, impiegatoDAOInstance);
 
 			System.out.println("__________________________________________________________________________________");
 
@@ -142,7 +145,7 @@ public class TestGestioneCompagnia {
 		}
 		Compagnia primoCompagniaLista = compagniaDAOInstance.list().get(0);
 		Date dataNascita = new SimpleDateFormat("dd-MM-yyyy").parse("02-12-1999");
-		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("10-02-2022");
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("10-02-2012");
 		Impiegato flavioAmatoImpiegato = new Impiegato("Flavio", "Amato", "CodFisAmato", dataNascita, dataAssunzione,
 				primoCompagniaLista);
 		int quantiElementiInseriti = impiegatoDAOInstance.insert(flavioAmatoImpiegato);
@@ -241,5 +244,23 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("...........testFindByExample fine: PASSED...........");
+	}
+
+	private static void testFindAllByDataAssunzioneGreaterThan(CompagniaDAO compagniaDAOInstance,
+			ImpiegatoDAO impiegatoDAOInstance) throws Exception {
+		System.out.println("...........testFindAllByDataAssunzioneGreaterThan inizio...........");
+
+		List<Impiegato> impiegatiAttuali = impiegatoDAOInstance.list();
+
+		if (impiegatiAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllByDataAssunzioneGreaterThan: FAILED, non ci sono impiegati nel DB");
+		}
+
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("20-01-2018");
+
+		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance
+				.findAllByDataAssunzioneGreaterThan(dataAssunzione);
+
+		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
 	}
 }
