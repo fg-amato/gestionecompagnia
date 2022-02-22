@@ -1,5 +1,6 @@
 package it.gestionecompagnia.dao.compagnia;
 
+import java.sql.Connection;
 import java.util.Date;
 import java.util.List;
 
@@ -7,6 +8,10 @@ import it.gestionecompagnia.dao.AbstractMySQLDAO;
 import it.gestionecompagnia.model.Compagnia;
 
 public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
+
+	public CompagniaDAOImpl(Connection connection) {
+		super(connection);
+	}
 
 	@Override
 	public List<Compagnia> list() throws Exception {
