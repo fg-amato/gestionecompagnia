@@ -45,6 +45,8 @@ public class TestGestioneCompagnia {
 
 			testFindAllByRagioneSocialeContiene(compagniaDAOInstance);
 
+			testFindAllByCodFisContiene(compagniaDAOInstance, impiegatoDAOInstance);
+
 			System.out.println("__________________________________________________________________________________");
 
 			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
@@ -282,5 +284,20 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("...........testFindAllByRagioneSocialeContiene fine: PASSED...........");
+	}
+
+	private static void testFindAllByCodFisContiene(CompagniaDAO compagniaDAOInstance,
+			ImpiegatoDAO impiegatoDAOInstance) throws Exception {
+		System.out.println("...........testFindAllByCodFisContiene inizio...........");
+
+		List<Impiegato> impiegatiAttuali = impiegatoDAOInstance.list();
+
+		if (impiegatiAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllByCodFisContiene: FAILED, non ci sono impiegati nel DB");
+		}
+
+		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance.findAllByCodFisContiene("ama");
+
+		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
 	}
 }
