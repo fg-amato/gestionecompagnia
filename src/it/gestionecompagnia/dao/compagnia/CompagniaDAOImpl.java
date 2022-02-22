@@ -139,9 +139,44 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 	}
 
 	@Override
-	public List<Compagnia> findByExample(Compagnia input) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Compagnia> findByExample(Compagnia example) throws Exception {
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (example == null)
+			throw new Exception("Valore di input non ammesso.");
+
+		ArrayList<Compagnia> result = new ArrayList<Compagnia>();
+		Compagnia compagniaTemp = null;
+
+		String query = "select * from compagnia where 1=1 ";
+		if (example.getRagioneSociale() != null && !example.getRagioneSociale().isEmpty()) {
+			query += " and ragionesociale like '" + example.getRagioneSociale() + "%' ";
+		}
+		if (example.getFatturatoAnnuo() != null) {
+			query += " and fatturatoannuo like '" + example.getFatturatoAnnuo() + "%' ";
+		}
+
+		if (example.getDataFondazione() != null) {
+			query += " and datafondazione>='" + new java.sql.Date(example.getDataFondazione().getTime()) + "' ";
+		}
+
+		try (Statement ps = connection.createStatement()) {
+			ResultSet rs = ps.executeQuery(query);
+
+			while (rs.next()) {
+				compagniaTemp = new Compagnia();
+				compagniaTemp.setRagioneSociale(rs.getString("ragionesociale"));
+				compagniaTemp.setFatturatoAnnuo(rs.getLong("fatturatoannuo"));
+				compagniaTemp.setDataFondazione(rs.getDate("datafondazione"));
+				compagniaTemp.setId(rs.getLong("ID"));
+				result.add(compagniaTemp);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override

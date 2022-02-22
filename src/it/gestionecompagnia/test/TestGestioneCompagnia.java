@@ -38,6 +38,8 @@ public class TestGestioneCompagnia {
 			testUpdateCompagnia(compagniaDAOInstance);
 			System.out.println("In tabella compagnia ci sono " + compagniaDAOInstance.list().size() + " elementi");
 
+			testFindByExample(compagniaDAOInstance);
+
 			System.out.println("__________________________________________________________________________________");
 
 			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
@@ -223,5 +225,21 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("..........testUpdateImpiegato fine: PASSED............");
+	}
+
+	private static void testFindByExample(CompagniaDAO compagniaDAOInstance) throws Exception {
+		System.out.println("...........testFindByExample inizio...........");
+
+		Compagnia ammio = new Compagnia("Pi", null, null);
+
+		List<Compagnia> negoziConRagioneSociaeleCheIniziaPerAmmio = compagniaDAOInstance.findByExample(ammio);
+
+		for (Compagnia utentiConNomenegoziConRagioneSociaeleCheIniziaPerAmmioItem : negoziConRagioneSociaeleCheIniziaPerAmmio) {
+			if (!utentiConNomenegoziConRagioneSociaeleCheIniziaPerAmmioItem.getRagioneSociale().startsWith("Pi"))
+				throw new RuntimeException(
+						"testFindByExample : FAILED, la lista contiene ragioni sociali che non iniziano con Ammio");
+		}
+
+		System.out.println("...........testFindByExample fine: PASSED...........");
 	}
 }
