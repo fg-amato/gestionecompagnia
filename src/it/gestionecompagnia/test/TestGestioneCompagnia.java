@@ -2,7 +2,6 @@ package it.gestionecompagnia.test;
 
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +68,8 @@ public class TestGestioneCompagnia {
 			testCountByDataFondazioneCompagniaGreaterThan(impiegatoDAOInstance);
 
 			testFindAllByCompagniaConFatturatoMaggioreDi(impiegatoDAOInstance, compagniaDAOInstance);
+
+			testFindAllErroriAssunzioni(impiegatoDAOInstance, compagniaDAOInstance);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -268,8 +269,7 @@ public class TestGestioneCompagnia {
 
 		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("20-01-2018");
 
-		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance
-				.findAllByDataAssunzioneGreaterThan(dataAssunzione);
+		compagniaDAOInstance.findAllByDataAssunzioneGreaterThan(dataAssunzione);
 
 		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
 	}
@@ -302,7 +302,7 @@ public class TestGestioneCompagnia {
 			throw new RuntimeException("testFindAllByCodFisContiene: FAILED, non ci sono impiegati nel DB");
 		}
 
-		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance.findAllByCodFisContiene("ama");
+		compagniaDAOInstance.findAllByCodFisContiene("ama");
 
 		System.out.println("...........testFindAllByCodFisContiene fine: PASSED...........");
 	}
@@ -382,9 +382,28 @@ public class TestGestioneCompagnia {
 			throw new RuntimeException("testFindAllByCompagnia: FAILED, non ci sono impiegati nel DB");
 		}
 
-		List<Impiegato> impiegatoCheLavoraInCompagniaConFatturatoMaggioreDi = impiegatoDAOInstance
-				.findAllByCompagniaConFatturatoMaggioreDi(Long.parseLong("555"));
+		impiegatoDAOInstance.findAllByCompagniaConFatturatoMaggioreDi(Long.parseLong("555"));
 
 		System.out.println("...........testFindAllByCompagnia fine: PASSED...........");
+	}
+
+	private static void testFindAllErroriAssunzioni(ImpiegatoDAO impiegatoDAOInstance,
+			CompagniaDAO compagniaDAOInstance) throws Exception {
+		System.out.println("...........testFindAllErroriAssunzioni inizio...........");
+
+		List<Compagnia> compagnieAttuali = compagniaDAOInstance.list();
+
+		if (compagnieAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllErroriAssunzioni: FAILED, non ci sono compagnie nel DB");
+		}
+		List<Impiegato> impiegatiAttuali = impiegatoDAOInstance.list();
+
+		if (impiegatiAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllErroriAssunzioni: FAILED, non ci sono impiegati nel DB");
+		}
+
+		impiegatoDAOInstance.findAllErroriAssunzioni();
+
+		System.out.println("...........testFindAllErroriAssunzioni fine: PASSED...........");
 	}
 }
