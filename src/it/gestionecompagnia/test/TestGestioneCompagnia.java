@@ -68,6 +68,8 @@ public class TestGestioneCompagnia {
 
 			testCountByDataFondazioneCompagniaGreaterThan(impiegatoDAOInstance);
 
+			testFindAllByCompagniaConFatturatoMaggioreDi(impiegatoDAOInstance, compagniaDAOInstance);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -363,5 +365,26 @@ public class TestGestioneCompagnia {
 					"testCountByDataFondazioneCompagniaGreaterThan: FAILED, valore di ritorno non valido");
 		}
 		System.out.println("...........testCountByDataFondazioneCompagniaGreaterThan fine: PASSED...........");
+	}
+
+	private static void testFindAllByCompagniaConFatturatoMaggioreDi(ImpiegatoDAO impiegatoDAOInstance,
+			CompagniaDAO compagniaDAOInstance) throws Exception {
+		System.out.println("...........testFindAllByCompagnia inizio...........");
+
+		List<Compagnia> compagnieAttuali = compagniaDAOInstance.list();
+
+		if (compagnieAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllByCompagnia: FAILED, non ci sono compagnie nel DB");
+		}
+		List<Impiegato> impiegatiAttuali = impiegatoDAOInstance.list();
+
+		if (impiegatiAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllByCompagnia: FAILED, non ci sono impiegati nel DB");
+		}
+
+		List<Impiegato> impiegatoCheLavoraInCompagniaConFatturatoMaggioreDi = impiegatoDAOInstance
+				.findAllByCompagniaConFatturatoMaggioreDi(Long.parseLong("555"));
+
+		System.out.println("...........testFindAllByCompagnia fine: PASSED...........");
 	}
 }

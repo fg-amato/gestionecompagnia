@@ -266,8 +266,36 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 
 	@Override
 	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(Long fatturatoInput) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (fatturatoInput == null)
+			throw new Exception("Valore di input non ammesso.");
+
+		ArrayList<Impiegato> result = new ArrayList<Impiegato>();
+		Impiegato impiegatoTemp = null;
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select * from impiegato i inner join compagnia c on i.compagnia_id = c.id where c.fatturatoannuo >= ?")) {
+			ps.setLong(1, fatturatoInput);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					impiegatoTemp = new Impiegato();
+					impiegatoTemp.setNome(rs.getString("Nome"));
+					impiegatoTemp.setCognome(rs.getString("Cognome"));
+					impiegatoTemp.setCodiceFiscale(rs.getString("CodiceFiscale"));
+					impiegatoTemp.setDataAssunzione(rs.getDate("DataAssunzione"));
+					impiegatoTemp.setDataDiNascita(rs.getDate("DataNascita"));
+					impiegatoTemp.setId(rs.getLong("ID"));
+					result.add(impiegatoTemp);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override
