@@ -66,6 +66,8 @@ public class TestGestioneCompagnia {
 
 			testFindAllByCompagnia(impiegatoDAOInstance, compagniaDAOInstance);
 
+			testCountByDataFondazioneCompagniaGreaterThan(impiegatoDAOInstance);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -342,5 +344,24 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("...........testFindAllByCompagnia fine: PASSED...........");
+	}
+
+	private static void testCountByDataFondazioneCompagniaGreaterThan(ImpiegatoDAO impiegatoDAOInstance)
+			throws Exception {
+		System.out.println("...........testCountByDataFondazioneCompagniaGreaterThan inizio...........");
+
+		List<Impiegato> impiegatiAttuali = impiegatoDAOInstance.list();
+
+		if (impiegatiAttuali.size() < 1) {
+			throw new RuntimeException(
+					"testCountByDataFondazioneCompagniaGreaterThan: FAILED, non ci sono impiegati nel DB");
+		}
+		Date dataFondazione = new SimpleDateFormat("dd-MM-yyyy").parse("10-11-1992");
+
+		if (impiegatoDAOInstance.countByDataFondazioneCompagniaGreaterThan(dataFondazione) < 0) {
+			throw new RuntimeException(
+					"testCountByDataFondazioneCompagniaGreaterThan: FAILED, valore di ritorno non valido");
+		}
+		System.out.println("...........testCountByDataFondazioneCompagniaGreaterThan fine: PASSED...........");
 	}
 }
