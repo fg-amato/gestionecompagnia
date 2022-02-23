@@ -205,25 +205,53 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	}
 
 	@Override
-	public List<Impiegato> findAllByCompagnia(Compagnia compagniaInput) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Impiegato> findAllByCompagnia(Compagnia compagniaInput) throws Exception {
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (compagniaInput == null)
+			throw new Exception("Valore di input non ammesso.");
+
+		ArrayList<Impiegato> result = new ArrayList<Impiegato>();
+		Impiegato impiegatoTemp = null;
+
+		try (PreparedStatement ps = connection.prepareStatement("select * from impiegato i where i.compagnia_id = ?")) {
+			ps.setLong(1, compagniaInput.getId());
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					impiegatoTemp = new Impiegato();
+					impiegatoTemp.setNome(rs.getString("Nome"));
+					impiegatoTemp.setCognome(rs.getString("Cognome"));
+					impiegatoTemp.setCodiceFiscale(rs.getString("CodiceFiscale"));
+					impiegatoTemp.setDataAssunzione(rs.getDate("DataAssunzione"));
+					impiegatoTemp.setDataDiNascita(rs.getDate("DataNascita"));
+					impiegatoTemp.setId(rs.getLong("ID"));
+					impiegatoTemp.setCompagniaPerCuiLavora(compagniaInput);
+					result.add(impiegatoTemp);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override
-	public int countByDataFondazioneCompagniaGreaterThan(Date dataInput) {
+	public int countByDataFondazioneCompagniaGreaterThan(Date dataInput) throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(Long fatturatoInput) {
+	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(Long fatturatoInput) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Impiegato> findAllErroriAssunzioni() {
+	public List<Impiegato> findAllErroriAssunzioni() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

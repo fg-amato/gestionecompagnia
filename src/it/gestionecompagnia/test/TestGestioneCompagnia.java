@@ -64,6 +64,8 @@ public class TestGestioneCompagnia {
 
 			testFindByExample(impiegatoDAOInstance);
 
+			testFindAllByCompagnia(impiegatoDAOInstance, compagniaDAOInstance);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -298,7 +300,7 @@ public class TestGestioneCompagnia {
 
 		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance.findAllByCodFisContiene("ama");
 
-		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
+		System.out.println("...........testFindAllByCodFisContiene fine: PASSED...........");
 	}
 
 	private static void testFindByExample(ImpiegatoDAO impiegatoDAOInstance) throws Exception {
@@ -316,5 +318,29 @@ public class TestGestioneCompagnia {
 		}
 
 		System.out.println("...........testFindByExample fine: PASSED...........");
+	}
+
+	private static void testFindAllByCompagnia(ImpiegatoDAO impiegatoDAOInstance, CompagniaDAO compagniaDAOInstance)
+			throws Exception {
+		System.out.println("...........testFindAllByCompagnia inizio...........");
+
+		List<Compagnia> compagnieAttuali = compagniaDAOInstance.list();
+
+		if (compagnieAttuali.size() < 1) {
+			throw new RuntimeException("testFindAllByCompagnia: FAILED, non ci sono compagnie nel DB");
+		}
+
+		Compagnia primaCompagnia = compagnieAttuali.get(0);
+		List<Impiegato> impiegatoCheLavoraInPrimaCompagnia = impiegatoDAOInstance.findAllByCompagnia(primaCompagnia);
+
+		for (Impiegato impiegatoCheLavoraInPrimaCompagniaItem : impiegatoCheLavoraInPrimaCompagnia) {
+			if (!(impiegatoCheLavoraInPrimaCompagniaItem.getCompagniaPerCuiLavora().getId() == primaCompagnia
+					.getId())) {
+				throw new RuntimeException(
+						"testFindAllByCompagnia: FAILED, l'id della compagnia non è quello ricercato");
+			}
+		}
+
+		System.out.println("...........testFindAllByCompagnia fine: PASSED...........");
 	}
 }
