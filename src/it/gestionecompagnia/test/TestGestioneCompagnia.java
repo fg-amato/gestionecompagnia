@@ -62,6 +62,8 @@ public class TestGestioneCompagnia {
 			testUpdateImpiegato(impiegatoDAOInstance, compagniaDAOInstance);
 			System.out.println("In tabella impiegato ci sono " + impiegatoDAOInstance.list().size() + " elementi");
 
+			testFindByExample(impiegatoDAOInstance);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -203,8 +205,6 @@ public class TestGestioneCompagnia {
 
 		System.out.println(".......testDeleteImpiegato fine: PASSED.............");
 
-		System.out.println(".......testDeleteImpiegato fine: PASSED.............");
-
 	}
 
 	private static void testUpdateImpiegato(ImpiegatoDAO impiegatoDAOInstance, CompagniaDAO compagniaDAOInstance)
@@ -237,12 +237,12 @@ public class TestGestioneCompagnia {
 	private static void testFindByExample(CompagniaDAO compagniaDAOInstance) throws Exception {
 		System.out.println("...........testFindByExample inizio...........");
 
-		Compagnia ammio = new Compagnia("Pi", null, null);
+		Compagnia ammio = new Compagnia("Ammio", null, null);
 
 		List<Compagnia> negoziConRagioneSociaeleCheIniziaPerAmmio = compagniaDAOInstance.findByExample(ammio);
 
 		for (Compagnia utentiConNomenegoziConRagioneSociaeleCheIniziaPerAmmioItem : negoziConRagioneSociaeleCheIniziaPerAmmio) {
-			if (!utentiConNomenegoziConRagioneSociaeleCheIniziaPerAmmioItem.getRagioneSociale().startsWith("Pi"))
+			if (!utentiConNomenegoziConRagioneSociaeleCheIniziaPerAmmioItem.getRagioneSociale().startsWith("Ammio"))
 				throw new RuntimeException(
 						"testFindByExample : FAILED, la lista contiene ragioni sociali che non iniziano con Ammio");
 		}
@@ -299,5 +299,22 @@ public class TestGestioneCompagnia {
 		List<Compagnia> compagnieDataAssunzioneGreaterThan = compagniaDAOInstance.findAllByCodFisContiene("ama");
 
 		System.out.println("...........testFindAllByDataAssunzioneGreaterThan fine: PASSED...........");
+	}
+
+	private static void testFindByExample(ImpiegatoDAO impiegatoDAOInstance) throws Exception {
+		System.out.println("...........testFindByExample inizio...........");
+
+		Impiegato impiegatoDiProva = new Impiegato("Fla", "Ama", "C", null, null, null);
+
+		List<Impiegato> impiegatoByExample = impiegatoDAOInstance.findByExample(impiegatoDiProva);
+
+		for (Impiegato impiegatoByExampleItem : impiegatoByExample) {
+			if (!impiegatoByExampleItem.getNome().startsWith("Fla")
+					|| !impiegatoByExampleItem.getCognome().startsWith("Ama")
+					|| !impiegatoByExampleItem.getCodiceFiscale().startsWith("C"))
+				throw new RuntimeException("testFindByExample : FAILED, la lista contiene valori errati");
+		}
+
+		System.out.println("...........testFindByExample fine: PASSED...........");
 	}
 }

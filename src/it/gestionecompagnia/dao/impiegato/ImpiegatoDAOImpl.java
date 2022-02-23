@@ -89,13 +89,14 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 
 		int result = 0;
 		try (PreparedStatement ps = connection.prepareStatement(
-				"UPDATE impiegato SET nome=?, cognome=?, codicefiscale=?, datanascita = ?, dataassunzione = ? where id=?;")) {
+				"UPDATE impiegato SET nome=?, cognome=?, codicefiscale=?, datanascita = ?, dataassunzione = ?, compagnia_id = ? where id=?;")) {
 			ps.setString(1, impiegatoInput.getNome());
 			ps.setString(2, impiegatoInput.getCognome());
 			ps.setString(3, impiegatoInput.getCodiceFiscale());
 			ps.setDate(4, new java.sql.Date(impiegatoInput.getDataDiNascita().getTime()));
 			ps.setDate(5, new java.sql.Date(impiegatoInput.getDataAssunzione().getTime()));
-			ps.setLong(6, impiegatoInput.getId());
+			ps.setLong(6, impiegatoInput.getCompagniaPerCuiLavora().getId());
+			ps.setLong(7, impiegatoInput.getId());
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -149,9 +150,58 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	}
 
 	@Override
-	public List<Impiegato> findByExample(Impiegato input) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Impiegato> findByExample(Impiegato example) throws Exception {
+		if (isNotActive())
+			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
+
+		if (example == null)
+			throw new Exception("Valore di input non ammesso.");
+
+		ArrayList<Impiegato> result = new ArrayList<Impiegato>();
+		Impiegato impiegatoTemp = null;
+
+		String query = "select * from impiegato where 1=1 ";
+		if (example.getNome() != null && !example.getNome().isEmpty()) {
+			query += " and nome like '" + example.getNome() + "%' ";
+		}
+		if (example.getCognome() != null && !example.getCognome().isEmpty()) {
+			query += " and cognome like '" + example.getCognome() + "%' ";
+		}
+
+		if (example.getCodiceFiscale() != null && !example.getCodiceFiscale().isEmpty()) {
+			query += " and codicefiscale like '" + example.getCodiceFiscale() + "%' ";
+		}
+
+		if (example.getDataDiNascita() != null) {
+			query += " and datanascita>='" + new java.sql.Date(example.getDataDiNascita().getTime()) + "' ";
+		}
+
+		if (example.getDataAssunzione() != null) {
+			query += " and dataassunzione >='" + new java.sql.Date(example.getDataAssunzione().getTime()) + "' ";
+		}
+
+		if (example.getCompagniaPerCuiLavora() != null) {
+			query += " and compagnia_id >='" + example.getCompagniaPerCuiLavora().getId() + "' ";
+		}
+
+		try (Statement ps = connection.createStatement()) {
+
+			ResultSet rs = ps.executeQuery(query);
+			while (rs.next()) {
+				impiegatoTemp = new Impiegato();
+				impiegatoTemp.setNome(rs.getString("Nome"));
+				impiegatoTemp.setCognome(rs.getString("Cognome"));
+				impiegatoTemp.setCodiceFiscale(rs.getString("CodiceFiscale"));
+				impiegatoTemp.setDataAssunzione(rs.getDate("DataAssunzione"));
+				impiegatoTemp.setDataDiNascita(rs.getDate("DataNascita"));
+				impiegatoTemp.setId(rs.getLong("ID"));
+				result.add(impiegatoTemp);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
 	}
 
 	@Override
